@@ -1,57 +1,32 @@
 #!/usr/bin/python3
-"""Prime Game Module"""
+"""Prime game winner determination in python"""
 
 
 def isWinner(x, nums):
-    """Method determine prime game winner"""
-    mariaCount = 0
-    benCount = 0
+    """Prime game winner determination"""
+    if x < 1 or not nums:
+        return None
 
-    for num in nums:
-        roundSet = list(range(1, num + 1))
-        primeSet = primes_in_range(1, num)
+    m_wins = 0
+    b_wins = 0
 
-        if not primeSet:
-            benCount += 1
-            continue
+    # generate a list of prime number based on the max numbers in num
+    n = max(nums)
+    primes = [True] * (n + 1)
+    primes[0] = primes[1] = False
 
-        MariaTurn = True
+    for x in range(2, int(n**0.5) + 1):
+        if primes[x]:
+            for y in range(x**2, n + 1, x):
+                primes[y] = False
 
-        while(True):
-            if not primeSet:
-                if MariaTurn:
-                    benCount += 1
-                else:
-                    mariaCount += 1
-                break
+    # count the no of pm less than n i nums
+    for n in nums:
+        count = sum(primes[2:n+1])
+        b_wins += count % 2 == 0
+        m_wins += count % 2 == 1
 
-            smallestPrime = primeSet.pop(0)
-            roundSet.remove(smallestPrime)
+    if m_wins == b_wins:
+        return None
 
-            roundSet = [x for x in roundSet if x % smallestPrime != 0]
-
-            MariaTurn = not MariaTurn
-
-    if mariaCount > benCount:
-        return "Maria"
-
-    if mariaCount < benCount:
-        return "Ben"
-
-    return None
-
-
-def is_prime(n):
-    """Return True in case n is prime"""
-    if n < 2:
-        return False
-    for i in range(2, int(n ** 0.5) + 1):
-        if n % i == 0:
-            return False
-    return True
-
-
-def primes_in_range(start, end):
-    """Return prime noms list"""
-    primes = [n for n in range(start, end+1) if is_prime(n)]
-    return primes
+    return 'Maria' if m_wins > b_wins else 'Ben'
